@@ -13,7 +13,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Either use i386 or amd64 versions
   config.vm.box       = 'ubuntu/trusty32'
 
-  config.vm.hostname  = 'vm'
+  config.vm.hostname  = 'vm.furaha.com'
   config.ssh.forward_agent = true
 
   config.vm.provider "virtualbox" do |v|

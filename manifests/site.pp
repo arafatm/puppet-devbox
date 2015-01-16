@@ -1,19 +1,22 @@
-stage { 'preinstall':
-  before => Stage['main']
+Exec { path => '/usr/bin' }
+
+stage { 'pre':
+  before => Stage['main'],
 }
 
-class apt_get_update {
-  exec { 'apt_update': 
-  command => '/usr/bin/apt-get update', 
+class apt_updates {
+  exec { 'apt-get update':
+    path => '/usr/bin',
   }
 }
 
-class { 'apt_get_update':
-  stage => preinstall
+class { 'apt_updates':
+  stage => 'pre'
 } 
 
 class postgresql {
-  package { 'postgresql':  ensure => installed }
+  package { 'postgresql': ensure => installed }
+  package { 'libpq-dev':  ensure => installed }
   service { 'postgresql': ensure => running }
 }
 
