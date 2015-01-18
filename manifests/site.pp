@@ -10,10 +10,11 @@ class node-ppa {
   exec { "add-node-repo":
     command => "curl -sL https://deb.nodesource.com/setup | sudo bash -",
     unless  => "/usr/bin/test -s ${sources}/nodesource.list",
+    notify => Exec['apt-update']
   }
   exec { "apt-update":
     command => "/usr/bin/apt-get update",
-    require => Exec['add-node-repo'],
+    refreshonly => true
   }
   package {"nodejs":
     ensure => "installed", 
