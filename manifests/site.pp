@@ -1,18 +1,5 @@
 Exec { path => '/usr/bin' }
 
-stage { 'pre':
-  before => Stage['main'],
-}
-
-class apt_updates {
-  exec { 'apt-get update':
-    path => '/usr/bin',
-  }
-}
-
-class { 'apt_updates':
-  stage => 'pre'
-} 
 
 class postgresql {
   package { 'postgresql': ensure => installed }
@@ -20,6 +7,15 @@ class postgresql {
   service { 'postgresql': ensure => running }
 }
 
+
+if $::foo != undef {
+  notify { "$::foo": }
+}
+else {
+  notify { "no foo for you": }
+}
+
+notify { "$::fqdn": }
 #apt::ppa { 'ppa:chris-lea/node.js': }
 
 # ruby/rails
