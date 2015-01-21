@@ -25,6 +25,9 @@ install_module puppetlabs-stdlib
 install_module puppetlabs-apt
 install_module puppetlabs-nodejs
 install_module puppetlabs-postgresql
+install_module puppetlabs-vcsrepo
+
+cd /vagrant && sudo puppet apply manifests/site.pp
 
 #USER=$1
 #RUBY=$2

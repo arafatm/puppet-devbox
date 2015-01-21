@@ -3,10 +3,28 @@ Exec { path => '/usr/bin' }
 $sources = "/etc/apt/sources.list.d"
 
 node "vm" {
+  $localuser = "vagrant"
+
+  if $dotuser == undef {
+    $dotuser = "arafatm"
+  }
+
   include node_repo
   include base
   include postgresql
+  include dotfiles
 }
+
+class dotfiles {
+  exec { 'dotfiles':
+    creates => "/home/$localuser/dotfiles",
+    path    => '/bin:/usr/bin',
+    command => "su -c 'git clone https://github.com/$dotuser/dotfiles.git /home/$localuser/dotfiles && bash /home/$localuser/dotfiles/setup.dotfiles.sh --force' $localuser",
+
+    require => Class['base']
+  }
+}
+
 
 class node_repo {
   exec { "add_node_repo":
@@ -49,27 +67,7 @@ class { 'postgresql':
   require => Package[$base],
 }
 
-class dotfiles {
-  exec { 'dotfiles':
-    creates => '/home/vagrant/dotfiles',
-    path    => '/bin:/usr/bin',
-    command => "su -c 'git clone https://github.com/arafatm/dotfiles.git
-    /home/$username/dotfiles && bash /home/$username/dotfiles/setup.dotfiles.sh
-    --force' $username",
 
-    require => Class['base']
-  }
-}
-
-
-if $::foo != undef {
-  notify { "$::foo": }
-}
-else {
-  notify { "no foo for you": }
-}
-
-notify { "$::fqdn": }
 #apt::ppa { 'ppa:chris-lea/node.js': }
 
 # ruby/rails
