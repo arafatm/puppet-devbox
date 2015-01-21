@@ -8,7 +8,7 @@ if [ ! -f /etc/apt/sources.list.d/puppetlabs.list ]; then
   dpkg -i puppetlabs-release-$(lsb_release -sc).deb
 fi
 
-#apt-get update
+apt-get update
 
 mkdir -p /etc/puppet/modules;
 
@@ -23,6 +23,7 @@ install_module() {
 
 install_module puppetlabs-stdlib
 install_module puppetlabs-apt
+install_module puppetlabs-nodejs
 install_module puppetlabs-postgresql
 
 #USER=$1
