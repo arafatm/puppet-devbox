@@ -11,13 +11,13 @@ end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Either use i386 or amd64 versions
-  config.vm.box       = 'ubuntu/trusty32'
+  config.vm.box       = 'puppetlabs/debian-7.6-32-nocm'
 
   config.vm.hostname  = 'vm.furaha.com'
   config.ssh.forward_agent = true
 
   config.vm.provider "virtualbox" do |v|
-    v.memory = 1024
+    v.memory = 2048
   end
 
   # args:
