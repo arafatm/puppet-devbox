@@ -19,9 +19,8 @@ class dotfiles {
   exec { 'dotfiles':
     creates => "/home/$localuser/dotfiles",
     path    => '/bin:/usr/bin',
-    command => "su -c 'git clone https://github.com/$dotuser/dotfiles.git /home/$localuser/dotfiles && bash /home/$localuser/dotfiles/setup.dotfiles.sh --force' $localuser",
-
-    require => Class['base']
+    command => "su -c 'git clone git@github.com:$dotuser/dotfiles.git /home/$localuser/dotfiles && bash /home/$localuser/dotfiles/setup.dotfiles.sh --force' $localuser",
+    require => Class['base'],
   }
 }
 
@@ -38,10 +37,8 @@ class node_repo {
   }
 }
 
-$base = [ 'curl', 'git', 'tmux', 'vim', 'zlib1g-dev', 'build-essential',
-'libssl-dev', 'libreadline-dev', 'libyaml-dev', 'libsqlite3-dev', 'sqlite3',
-'libxml2-dev', 'libxslt1-dev', 'libcurl4-openssl-dev',
-'python-software-properties', 'imagemagick', 'libmagickwand-dev', 'nodejs']
+$base = [ 'curl', 'git', 'tmux', 'vim', 'build-essential', 
+'libreadline-dev', 'libssl-dev', 'libcurl4-openssl-dev', 'nodejs']
 
 class base {
   package { $base:

@@ -9,6 +9,7 @@ if [ ! -f /etc/apt/sources.list.d/puppetlabs.list ]; then
 fi
 
 apt-get update
+apt-get install -y puppet
 
 mkdir -p /etc/puppet/modules;
 
