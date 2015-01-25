@@ -3,7 +3,9 @@ Exec { path => '/usr/bin' }
 $sources = "/etc/apt/sources.list.d"
 
 node "vm" {
-  $localuser = "vagrant"
+  if $localuser == undef {
+    $localuser = "vagrant"
+  }
 
   if $dotuser == undef {
     $dotuser = "arafatm"
