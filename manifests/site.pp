@@ -1,4 +1,4 @@
-Exec { path => '/usr/bin' }
+Exec { path => ['/bin', '/usr/bin'] }
 
 $sources = "/etc/apt/sources.list.d"
 
@@ -26,7 +26,8 @@ node "vm" {
   }
   exec { 'pgcrypto':
     command => "sudo -u postgres psql template1 -c 'create extension pgcrypto'",
-    unless => "sudo -u postgres psql template1 -c '\\dx' | grep -c pgcrypto'",
+    #command => "echo 'yermom'",
+    unless => "sudo -u postgres psql template1 -c '\\dx' | grep pgcrypto",
     require => Class['postgresql::server::contrib'],
   }
 
