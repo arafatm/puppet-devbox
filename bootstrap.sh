@@ -2,31 +2,36 @@
 
 export DEBIAN_FRONTEND=noninteractive 
 
-# Install Puppet Source
-if [ ! -f /etc/apt/sources.list.d/puppetlabs.list ]; then
-  wget http://apt.puppetlabs.com/puppetlabs-release-$(lsb_release -sc).deb
-  dpkg -i puppetlabs-release-$(lsb_release -sc).deb
-fi
+install_puppet() {
+  # Install Puppet Source
+  if [ ! -f /etc/apt/sources.list.d/puppetlabs.list ]; then
+    wget http://apt.puppetlabs.com/puppetlabs-release-$(lsb_release -sc).deb
+    dpkg -i puppetlabs-release-$(lsb_release -sc).deb
+  fi
 
-apt-get update
-apt-get install -y puppet
+  apt-get update
+  apt-get install -y puppet
 
-mkdir -p /etc/puppet/modules;
+  mkdir -p /etc/puppet/modules;
+}
 
-# Install Puppet Modules
-
-install_module() {
+install_puppet_module() {
   folder=`echo $1 | sed s/.*-//`
   if [ ! -d /etc/puppet/modules/$folder ]; then
     puppet module install $1
   fi
 }
 
-install_module puppetlabs-stdlib
-install_module puppetlabs-apt
-install_module puppetlabs-nodejs
-install_module puppetlabs-postgresql
-install_module puppetlabs-vcsrepo
+if [ ! -f /etc/vagrant-bootstrapped ]; then
+  install_puppet
+  touch /etc/vagrant-bootstrapped
+fi 
+
+install_puppet_module puppetlabs-stdlib
+install_puppet_module puppetlabs-apt
+install_puppet_module puppetlabs-nodejs
+install_puppet_module puppetlabs-postgresql
+install_puppet_module puppetlabs-vcsrepo
 
 cd /vagrant && sudo puppet apply manifests/site.pp
 
@@ -54,9 +59,9 @@ cd /vagrant && sudo puppet apply manifests/site.pp
 #  if [ ! -f /etc/apt/sources.list.d/pgdg.list ]; then 
 #    msg "adding postgresql repo"
 #    sudo sh -c "echo 'deb http://apt.postgresql.org/pub/repos/apt/ \
-#      $(lsb_release -sc)-pgdg main' > /etc/apt/sources.list.d/pgdg.list"
+  #      $(lsb_release -sc)-pgdg main' > /etc/apt/sources.list.d/pgdg.list"
 #    wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | \
-#      sudo apt-key add -
+  #      sudo apt-key add -
 #  fi
 #}
 #
@@ -103,7 +108,7 @@ cd /vagrant && sudo puppet apply manifests/site.pp
 #    cd $HOME/tmp
 #    # Install Ruby. Skip if you've already done this.
 #    wget -O ruby-install.tar.gz \
-#      https://github.com/postmodern/ruby-install/archive/v0.5.0.tar.gz
+  #      https://github.com/postmodern/ruby-install/archive/v0.5.0.tar.gz
 #    tar -xzvf ruby-install.tar.gz
 #    cd ruby-install-*
 #    make update
@@ -114,7 +119,7 @@ cd /vagrant && sudo puppet apply manifests/site.pp
 #    msg "installing chruby"
 #    cd $HOME/tmp
 #    wget -O chruby.tar.gz \
-#      https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
+  #      https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
 #    tar -xzvf chruby.tar.gz
 #    cd chruby-*
 #    sudo make install
@@ -152,11 +157,11 @@ cd /vagrant && sudo puppet apply manifests/site.pp
 #
 #    msg "rbenv: ruby-build"
 #    git clone git://github.com/sstephenson/ruby-build.git \
-#      $HOME/.rbenv/plugins/ruby-build
+  #      $HOME/.rbenv/plugins/ruby-build
 #
 #    msg "rbenv: rbenv-gem-rehash"
 #    git clone https://github.com/sstephenson/rbenv-gem-rehash.git \
-#      $HOME/.rbenv/plugins/rbenv-gem-rehash
+  #      $HOME/.rbenv/plugins/rbenv-gem-rehash
 #  else
 #    msg "updating ruby version"
 #  fi

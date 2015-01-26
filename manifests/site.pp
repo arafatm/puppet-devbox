@@ -13,15 +13,34 @@ node "vm" {
 
   include node_repo
   include base
-  include postgresql
+  #include postgresql
   include dotfiles
+
+  class { 'postgresql::server':
+    ip_mask_deny_postgres_user  => '0.0.0.0/32',
+    require                    => Class['base'],
+    package_ensure  => latest,
+  }
+  class { 'postgresql::server::contrib':
+    package_ensure  => latest,
+  }
+  exec { 'pgcrypto':
+    command => "sudo -u postgres psql template1 -c 'create extension pgcrypto'",
+    unless => "sudo -u postgres psql template1 -c '\\dx' | grep -c pgcrypto'",
+    require => Class['postgresql::server::contrib'],
+  }
+
+  postgresql::server::db { 'mydatabasename':
+    user     => 'mydatabaseuser',
+    password => postgresql_password('mydatabaseuser', 'mypassword'),
+  }
 }
 
 class dotfiles {
   exec { 'dotfiles':
     creates => "/home/$localuser/dotfiles",
     path    => '/bin:/usr/bin',
-    command => "su -c 'git clone git@github.com:$dotuser/dotfiles.git /home/$localuser/dotfiles && bash /home/$localuser/dotfiles/setup.dotfiles.sh --force' $localuser",
+    command => "su -c 'git clone https://github.com/$dotuser/dotfiles.git /home/$localuser/dotfiles && bash /home/$localuser/dotfiles/setup.dotfiles.sh --force' - $localuser",
     require => Class['base'],
   }
 }
@@ -37,33 +56,19 @@ class node_repo {
     command => "/usr/bin/apt-get update",
     refreshonly => true,
   }
+  package { 'nodejs':
+    ensure => latest,
+    require => Exec['apt_update']
+  }
 }
 
-$base = [ 'curl', 'git', 'tmux', 'vim', 'build-essential', 
-'libreadline-dev', 'libssl-dev', 'libcurl4-openssl-dev', 'nodejs']
+$base = [ 'curl', 'git', 'tmux', 'vim', 'build-essential', 'libreadline-dev',
+'libssl-dev', 'libcurl4-openssl-dev']
 
 class base {
   package { $base:
     ensure => latest,
-    require => Exec['add_node_repo'],
   }
-}
-
-class postgresql {
-  package { 'postgresql':
-    ensure => latest,
-  }
-  package { 'libpq-dev':
-    ensure => latest, 
-    require => Package['postgresql'], 
-  }
-  service { 'postgresql':
-    ensure => running, 
-    require => Package['libpq-dev'], 
-  }
-}
-class { 'postgresql':
-  require => Package[$base],
 }
 
 
