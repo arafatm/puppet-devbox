@@ -38,11 +38,21 @@ node "vm" {
 }
 
 class dotfiles {
-  exec { 'dotfiles':
-    creates => "/home/$localuser/dotfiles",
-    path    => '/bin:/usr/bin',
-    command => "su -c 'git clone https://github.com/$dotuser/dotfiles.git /home/$localuser/dotfiles && bash /home/$localuser/dotfiles/setup.dotfiles.sh --force' - $localuser",
-    require => Class['base'],
+  exec { 'ssh know github':
+    command => 'ssh-keyscan github.com',
+    user    => 'vagrant',
+    require => Class["base"], 
+  }
+
+  vcsrepo { "/home/$localuser/dotfiles":
+    ensure   => latest,
+    provider => git,
+    source   => "git@github.com:$dotuser/dotfiles.git",
+    user     => "$localuser",
+    owner    => "$localuser",
+    group    => "$localuser",
+    environment => 'HOME=${$home_path}',
+    require  => Exec['ssh know github'],
   }
 }
 

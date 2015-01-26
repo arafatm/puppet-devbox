@@ -3,16 +3,18 @@
 export DEBIAN_FRONTEND=noninteractive 
 
 install_puppet() {
-  # Install Puppet Source
-  if [ ! -f /etc/apt/sources.list.d/puppetlabs.list ]; then
-    wget http://apt.puppetlabs.com/puppetlabs-release-$(lsb_release -sc).deb
-    dpkg -i puppetlabs-release-$(lsb_release -sc).deb
-  fi
+  if [ ! -f /etc/vagrant-bootstrapped ]; then
+    if [ ! -f /etc/apt/sources.list.d/puppetlabs.list ]; then
+      wget http://apt.puppetlabs.com/puppetlabs-release-$(lsb_release -sc).deb
+      dpkg -i puppetlabs-release-$(lsb_release -sc).deb
+    fi
 
-  apt-get update
-  apt-get install -y puppet
+    apt-get update
+    apt-get install -y puppet
 
-  mkdir -p /etc/puppet/modules;
+    mkdir -p /etc/puppet/modules;
+    touch /etc/vagrant-bootstrapped
+  fi 
 }
 
 install_puppet_module() {
@@ -22,11 +24,7 @@ install_puppet_module() {
   fi
 }
 
-if [ ! -f /etc/vagrant-bootstrapped ]; then
-  install_puppet
-  touch /etc/vagrant-bootstrapped
-fi 
-
+install_puppet
 install_puppet_module puppetlabs-stdlib
 install_puppet_module puppetlabs-apt
 install_puppet_module puppetlabs-nodejs
