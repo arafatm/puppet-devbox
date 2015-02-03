@@ -15,7 +15,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box       = 'ubuntu/trusty32'
 
   config.vm.hostname  = 'vm.furaha.com'
-  config.ssh.private_key_path = ['~/.ssh/id_rsa']
   config.ssh.forward_agent = true
 
   config.vm.provider "virtualbox" do |v|

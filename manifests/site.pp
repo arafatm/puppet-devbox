@@ -3,6 +3,12 @@ Exec { path => ['/bin', '/usr/bin'] }
 $sources = "/etc/apt/sources.list.d"
 
 node "vm" {
+
+  include node_repo
+  include base
+  include install_postgresql
+
+  # This isn't reliable. See note in class dotfiles
   if $localuser == undef {
     $localuser = "vagrant"
   }
@@ -10,12 +16,17 @@ node "vm" {
   if $dotuser == undef {
     $dotuser = "arafatm"
   }
+  #include dotfiles
 
-  include node_repo
-  include base
-  #include postgresql
-  include dotfiles
 
+}
+
+class install_rbenv { 
+  class { 'rbenv': latest => true, }
+  rbenv::plugin {'sstephenson/ruby-build': latest => true }
+}
+
+class install_postgresql {
   class { 'postgresql::server':
     ip_mask_deny_postgres_user  => '0.0.0.0/32',
     require                    => Class['base'],
@@ -38,6 +49,8 @@ node "vm" {
 }
 
 class dotfiles {
+  # This doesn't work in vagrant unless you have ssh-agent
+  # on the host. On Windows, you need to run pagaent
   exec { 'ssh know github':
     command => 'ssh-keyscan github.com',
     user    => 'vagrant',
@@ -51,7 +64,6 @@ class dotfiles {
     user     => "$localuser",
     owner    => "$localuser",
     group    => "$localuser",
-    environment => 'HOME=${$home_path}',
     require  => Exec['ssh know github'],
   }
 }
@@ -73,8 +85,8 @@ class node_repo {
   }
 }
 
-$base = [ 'curl', 'git', 'tmux', 'vim', 'build-essential', 'libreadline-dev',
-'libssl-dev', 'libcurl4-openssl-dev']
+$base = [ 'curl', 'tmux', 'vim' ]
+#$base = [ 'curl', 'tmux', 'vim', 'build-essential', 'libreadline-dev', 'libssl-dev', 'libcurl4-openssl-dev']
 
 class base {
   package { $base:

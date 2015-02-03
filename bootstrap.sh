@@ -30,6 +30,7 @@ install_puppet_module puppetlabs-apt
 install_puppet_module puppetlabs-nodejs
 install_puppet_module puppetlabs-postgresql
 install_puppet_module puppetlabs-vcsrepo
+install_puppet_module jdowning-rbenv
 
 #cd /vagrant && sudo puppet apply manifests/site.pp
 
