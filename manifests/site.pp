@@ -7,6 +7,7 @@ node "vm" {
   include node_repo
   include base
   include install_postgresql
+  include install_rbenv
 
   # This isn't reliable. See note in class dotfiles
   if $localuser == undef {
