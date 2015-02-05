@@ -7,6 +7,7 @@ node "vm" {
   include node_repo
   include base
   include install_postgresql
+  include install_rbenv
 
   # This isn't reliable. See note in class dotfiles
   if $localuser == undef {
@@ -24,6 +25,9 @@ node "vm" {
 class install_rbenv { 
   class { 'rbenv': latest => true, }
   rbenv::plugin {'sstephenson/ruby-build': latest => true }
+  rbenv::plugin {'sstephenson/rbenv-gem-rehash': latest => true }
+  rbenv::build {'2.1.5': }
+  rbenv::gem  {'rails': ruby_version => '2.1.5' }
 }
 
 class install_postgresql {
