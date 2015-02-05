@@ -24,7 +24,9 @@ node "vm" {
 
 class install_rbenv { 
   class { 'rbenv': latest => true, }
-  rbenv::plugin {'sstephenson/ruby-build': latest => true }
+  rbenv::plugin { 'sstephenson/ruby-build': latest => true }
+  rbenv::build  { '2.1.5': }
+  rbenv::gem    { 'rails': ruby_version => '2.1.5' }
 }
 
 class install_postgresql {
