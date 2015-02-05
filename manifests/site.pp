@@ -34,9 +34,19 @@ class install_postgresql {
     require                    => Class['base'],
     package_ensure  => latest,
   }
-  class { 'postgresql::lib::devel':
-    package_ensure  =>  latest,
+  # you would think this would work but you would be wrong.
+  # See https://github.com/nesi/puppet-postgresql/pull/1/files
+  # class { 'postgresql::lib::devel':
+  #   package_ensure  =>  latest,
+  # }
+  package { 'postgresql-devel':
+    ensure => latest,
+    name    = $operatingsystem? {
+      Ubuntu  => "libpq-dev",
+      default => 'postgresql-devel',
+    }
   }
+
   class { 'postgresql::server::contrib':
     package_ensure  => latest,
   }
