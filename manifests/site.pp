@@ -39,12 +39,12 @@ class install_postgresql {
   # class { 'postgresql::lib::devel':
   #   package_ensure  =>  latest,
   # }
-  package { 'postgresql-devel':
+  $pgpackages   = $operatingsystem? {
+    Ubuntu  => ["libpq-dev", "postgresql-server-dev-9.3"],
+    default => 'postgresql-devel',
+  }
+  package { $pgpackages: 
     ensure => latest,
-    name    => $operatingsystem? {
-      Ubuntu  => "libpq-dev",
-      default => 'postgresql-devel',
-    }
   }
 
   class { 'postgresql::server::contrib':
