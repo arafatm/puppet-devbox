@@ -26,7 +26,6 @@ class install_rbenv {
   class { 'rbenv': latest => true, }
   rbenv::plugin { 'sstephenson/ruby-build': latest => true }
   rbenv::build  { '2.1.5': }
-  rbenv::gem    { 'rails': ruby_version => '2.1.5' }
 }
 
 class install_postgresql {
@@ -34,6 +33,9 @@ class install_postgresql {
     ip_mask_deny_postgres_user  => '0.0.0.0/32',
     require                    => Class['base'],
     package_ensure  => latest,
+  }
+  class { 'postgresql::lib::devel':
+    package_ensure  =>  latest,
   }
   class { 'postgresql::server::contrib':
     package_ensure  => latest,
@@ -45,9 +47,9 @@ class install_postgresql {
     require => Class['postgresql::server::contrib'],
   }
 
-  postgresql::server::db { 'mydatabasename':
-    user     => 'mydatabaseuser',
-    password => postgresql_password('mydatabaseuser', 'mypassword'),
+  postgresql::server::role { 'rails':
+    password_hash => postgresql_password('rails', 'railspass'),
+    createdb      => true,
   }
 }
 
