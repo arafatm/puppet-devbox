@@ -41,7 +41,7 @@ class install_postgresql {
   # }
   package { 'postgresql-devel':
     ensure => latest,
-    name    = $operatingsystem? {
+    name    => $operatingsystem? {
       Ubuntu  => "libpq-dev",
       default => 'postgresql-devel',
     }
