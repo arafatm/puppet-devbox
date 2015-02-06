@@ -27,7 +27,6 @@ class install_rbenv {
   rbenv::plugin {'sstephenson/ruby-build': latest => true }
   rbenv::plugin {'sstephenson/rbenv-gem-rehash': latest => true }
   rbenv::build {'2.1.5': }
-  rbenv::gem  {'rails': ruby_version => '2.1.5' }
 }
 
 class install_postgresql {
@@ -36,6 +35,19 @@ class install_postgresql {
     require                    => Class['base'],
     package_ensure  => latest,
   }
+  # you would think this would work but you would be wrong.
+  # See https://github.com/nesi/puppet-postgresql/pull/1/files
+  # class { 'postgresql::lib::devel':
+  #   package_ensure  =>  latest,
+  # }
+  $pgpackages   = $operatingsystem? {
+    Ubuntu  => ["libpq-dev", "postgresql-server-dev-9.3"],
+    default => 'postgresql-devel',
+  }
+  package { $pgpackages: 
+    ensure => latest,
+  }
+
   class { 'postgresql::server::contrib':
     package_ensure  => latest,
   }
@@ -46,9 +58,9 @@ class install_postgresql {
     require => Class['postgresql::server::contrib'],
   }
 
-  postgresql::server::db { 'mydatabasename':
-    user     => 'mydatabaseuser',
-    password => postgresql_password('mydatabaseuser', 'mypassword'),
+  postgresql::server::role { 'rails':
+    password_hash => postgresql_password('rails', 'railspass'),
+    createdb      => true,
   }
 }
 
