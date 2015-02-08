@@ -32,8 +32,9 @@ class install_rbenv {
 class install_postgresql {
   class { 'postgresql::server':
     ip_mask_deny_postgres_user  => '0.0.0.0/32',
-    require                    => Class['base'],
-    package_ensure  => latest,
+    ip_mask_allow_all_users     => '0.0.0.0/0',
+    require                     => Class['base'],
+    package_ensure              => latest,
   }
   # you would think this would work but you would be wrong.
   # See https://github.com/nesi/puppet-postgresql/pull/1/files
@@ -51,6 +52,7 @@ class install_postgresql {
   class { 'postgresql::server::contrib':
     package_ensure  => latest,
   }
+
   exec { 'pgcrypto':
     command => "sudo -u postgres psql template1 -c 'create extension pgcrypto'",
     #command => "echo 'yermom'",
