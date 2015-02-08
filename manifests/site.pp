@@ -4,10 +4,10 @@ $sources = "/etc/apt/sources.list.d"
 
 node "vm" {
 
-  include node_repo
-  include base
+  #include node_repo
+  #include base
   include install_postgresql
-  include install_rbenv
+  #include install_rbenv
 
   # This isn't reliable. See note in class dotfiles
   if $localuser == undef {
@@ -30,12 +30,11 @@ class install_rbenv {
 }
 
 class install_postgresql {
+
   class { 'postgresql::server':
-    ip_mask_deny_postgres_user  => '0.0.0.0/32',
-    ip_mask_allow_all_users     => '0.0.0.0/0',
-    require                    => Class['base'],
     package_ensure  => latest,
   }
+
   # you would think this would work but you would be wrong.
   # See https://github.com/nesi/puppet-postgresql/pull/1/files
   # class { 'postgresql::lib::devel':
@@ -45,6 +44,7 @@ class install_postgresql {
     Ubuntu  => ["libpq-dev", "postgresql-server-dev-9.3"],
     default => 'postgresql-devel',
   }
+
   package { $pgpackages: 
     ensure => latest,
   }
@@ -52,6 +52,7 @@ class install_postgresql {
   class { 'postgresql::server::contrib':
     package_ensure  => latest,
   }
+
   exec { 'pgcrypto':
     command => "sudo -u postgres psql template1 -c 'create extension pgcrypto'",
     #command => "echo 'yermom'",
@@ -59,10 +60,16 @@ class install_postgresql {
     require => Class['postgresql::server::contrib'],
   }
 
+  # doesn't work as expected. See
+  # https://tickets.puppetlabs.com/browse/MODULES-1706
   postgresql::server::role { 'rails':
-    password_hash => postgresql_password('rails', 'railspass'),
+    password_hash => postgresql_password('rails', 'rails'),
     createdb      => true,
+    require => Resource['postgresql::server::db'],
   }
+
+}
+class fml_postgresql {
 }
 
 class dotfiles {
